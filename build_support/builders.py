@@ -492,25 +492,6 @@ class PiglitTester(object):
             exclude_tests += ["spec.arb_tessellation_shader.execution.tess_with_geometry",
                               "spec.arb_tessellation_shader.execution.quads"]
 
-        # broken egl tests require X, and intermittently pass when run concurrently
-        exclude_tests += ["spec.egl.1_4.eglquerysurface.egl",
-                          "spec.egl_ext_client_extensions.conformance",
-                          "spec.egl_khr_create_context",
-                          "spec.egl_khr_get_all_proc_addresses",
-                          "spec.egl_khr_surfaceless_context",
-                          "spec.egl_mesa_configless_context",
-                          "spec.egl_nok_swap_region",
-                          "spec.egl_nok_texture_from_pixmap.basic",
-                          "spec.egl.1_4.eglterminate.then.unbind.context",
-                          "spec.egl_chromium_sync_control.conformance",
-                          "spec.egl.1_4.largest.possible.eglcreatepbuffersurface",
-                          "spec.egl.1_4.eglcreatepbuffersurface",
-                          "spec.egl_khr_fence_sync.conformance",
-                          "spec.egl_khr_gl_colorspace",
-                          # https://bugs.freedesktop.org/show_bug.cgi?id=99265
-                          "spec.egl_khr_gl_image.egl_khr_gl_renderbuffer_image-clear-shared-image.gl_depth_component24",
-                          "spec.egl_khr_gl_image.egl_khr_gl_renderbuffer_image-clear-shared-image.gl_rgba"]
-
         # https://bugs.freedesktop.org/show_bug.cgi?id=97577
         exclude_tests += ["spec.ext_shader_samples_identical.glsl-es-3_10.compiler.all-functions_vert",
                           "spec.oes_shader_io_blocks.compiler.layout-location-aliasing_vert"]
