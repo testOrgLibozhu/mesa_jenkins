@@ -338,6 +338,9 @@
     <project name="xonotic">
       <prerequisite name="mesa-perf" hardware="builder"/>
     </project>
+
+    <project name="apitrace"/>
+
     <project name="dota-pts">
       <prerequisite name="mesa-perf" hardware="builder"/>
       <prerequisite name="apitrace" config="release" hardware="builder"/>
