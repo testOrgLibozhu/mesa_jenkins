@@ -52,7 +52,7 @@ from builders import *
 from timer import TimeOut
 from deqp_builder import *
 from perf_builder import *
-
+from apitrace_perf import *
 class DefaultTimeout:
     def __init__(self, options=None):
         self._options = options
