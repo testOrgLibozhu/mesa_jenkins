@@ -339,7 +339,9 @@
       <prerequisite name="mesa-perf" hardware="builder"/>
     </project>
 
-    <project name="apitrace"/>
+    <project name="apitrace">
+      <prerequisite name="waffle"/>
+    </project>
 
     <project name="dota-pts">
       <prerequisite name="mesa-perf" hardware="builder"/>
