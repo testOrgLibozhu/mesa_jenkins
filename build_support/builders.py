@@ -266,11 +266,12 @@ class AutoBuilder(object):
             assert(not os.path.exists(self._build_dir))
 
 class CMakeBuilder(object):
-    def __init__(self, extra_definitions=None, compiler="gcc", install=True):
+    def __init__(self, extra_definitions=None, compiler="gcc", install=True, cpus=None):
         self._options = Options()
         self._project_map = ProjectMap()
         self._compiler = compiler
         self._install = install
+        self._cpus = cpus
 
         if not extra_definitions:
             extra_definitions = []
@@ -312,7 +313,9 @@ class CMakeBuilder(object):
                            "-DCMAKE_INSTALL_PREFIX:PATH=" + self._build_root] \
                           + self._extra_definitions, env=env)
 
-        run_batch_command(["ninja", "-j" + str(cpu_count())], env=env)
+        if not self._cpus:
+            self._cpus = cpu_count()
+        run_batch_command(["ninja", "-j" + str(self._cpus)], env=env)
         if self._install:
             print "Installing: output suppressed"
             run_batch_command(["ninja", "install"], streamedOutput=False, quiet=True)

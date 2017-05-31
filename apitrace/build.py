@@ -5,4 +5,4 @@ import os.path as path
 sys.path.append(path.join(path.dirname(path.abspath(sys.argv[0])), ".."))
 import build_support as bs
 
-bs.build(bs.CMakeBuilder())
+bs.build(bs.CMakeBuilder(cpus=2))
