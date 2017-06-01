@@ -51,7 +51,7 @@ class ApiTracePerf(object):
                "LIBGL_DRIVERS_PATH" : perf_prefix + "/dri"}
         self.opt.update_env(env)
 
-        #run_batch_command(cmd, env=env)
+        run_batch_command(cmd, env=env)
 
         out_fh = open(out_path, "rb")
         out_fh.readline()  # first line is file name
