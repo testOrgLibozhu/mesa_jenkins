@@ -21,6 +21,9 @@ class ApiTracePerf(object):
         """downloads the trace file if necessary"""
         local_file = self.conf["file"]
         if not os.path.exists(local_file):
+            dirname = os.path.split(local_file)[0]
+            if not os.path.exists(dirname):
+                os.makedirs(dirname)
             urlretrieve(self.conf["url"], local_file)
 
     def clean(self):
