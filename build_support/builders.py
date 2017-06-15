@@ -455,6 +455,7 @@ class PiglitTester(object):
                "-o",
                "-p", "gbm",
                "-b", "junit",
+               "--junit-subtests",
                "--junit_suffix", "." + suffix + o.arch,
 
                # intermittently fails snb?
