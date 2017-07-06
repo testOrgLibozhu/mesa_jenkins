@@ -483,7 +483,7 @@
     <spirvheaders repo="git://github.com/KhronosGroup/SPIRV-Headers"/>
     
     <sixonix repo="git://github.com/janesma/sixonix"
-             branch="origin/mesa_ci"/>
+             branch="origin/python_perf"/>
     <apitrace repo="git://github.com/janesma/apitrace"
               branch="origin/frameretrace"/>
   </repos>
@@ -563,7 +563,7 @@
     </branch>
 
     <branch name="mesa_perf" project="perf-all">
-      <sixonix branch="origin/mesa_ci" trigger="false"/>
+      <sixonix branch="origin/python_perf" trigger="false"/>
       <apitrace branch="origin/frameretrace" trigger="false"/>
     </branch>
     
