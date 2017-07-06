@@ -89,8 +89,19 @@ class PerfBuilder(object):
         iteration = 0
         for b in bench_runs:
             cmd = []
-            if os.name == "nt":
-                cmd = [sys.executable, "windows/run_benchmark.py"] + b
+            if b[0] in ["MANHATTAN",
+                     "MANHATTAN_O",
+                     "CAR_CHASE",
+                     "CAR_CHASE_O",
+                     "TREX",
+                     "TREX_O",
+                     "FILL",
+                     "FILL_O",
+                     "TESS",
+                     "TESS_O",
+                     "HEAVEN",
+                     "VALLEY"]:
+                cmd = [sys.executable, "run_benchmark.py"] + b
             else:
                 cmd = ["./glx.sh", mesa_dir] + b
             print " ".join(cmd)
