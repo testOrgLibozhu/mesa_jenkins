@@ -59,7 +59,8 @@ class VulkanTester(object):
             icd_name = "intel_icd.i686.json"
         env = {"VK_ICD_FILENAMES" : pm.build_root() + \
                "/share/vulkan/icd.d/" + icd_name,
-               "ANV_ABORT_ON_DEVICE_LOSS" : "true"}
+               "ANV_ABORT_ON_DEVICE_LOSS" : "true",
+               "LD_LIBRARY_PATH" : pm.build_root() + "/lib/vulkancts"}
         tester = bs.DeqpTester()
         binary = pm.build_root() + "/opt/deqp/modules/vulkan/deqp-vk"
         results = tester.test(binary,
@@ -68,6 +69,9 @@ class VulkanTester(object):
                               env=env)
         o = bs.Options()
         mv = bs.mesa_version()
+        if "17.1" in mv or "17.2" in mv:
+            # mesa-as-vulkan-loader only exists in 17.3
+            del env["LD_LIBRARY_PATH"]
         if "glk" in o.hardware and "13.0" in mv:
             print "WARNING: glk not supported by stable mesa"
             return

@@ -37,8 +37,22 @@ class MesaBuilder(bs.AutoBuilder):
 
         # always enable optimizations in mesa because tests are too slow
         # without them.
-        bs.AutoBuilder.__init__(self, configure_options=options, opt_flags="-O2")
+        bs.AutoBuilder.__init__(self, configure_options=options,
+                                # enable vulkan loader in mesa
+                                opt_flags="-O2 -DANV_EXPORT_GET_INSTANCE_PROC_ADDR")
 
+    def build(self):
+        bs.AutoBuilder.build(self)
+        # make a symlink for libvulkan, so we don't need to use the
+        # LunarG loader, which is often out of date.
+        target_dir = self._build_root + "/lib/vulkancts"
+        if not os.path.exists(target_dir):
+            os.makedirs(target_dir)
+        target = target_dir + "/libvulkan.so.1"
+        if os.path.exists(target):
+            os.unlink(target)
+        os.symlink("../libvulkan_intel.so", target)
+        
     def test(self):
         """Provide gtests as available"""
         # override the test method, because tests have moved

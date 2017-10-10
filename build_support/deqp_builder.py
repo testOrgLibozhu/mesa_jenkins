@@ -419,7 +419,10 @@ class DeqpTester:
                      # when display sleeps, cratering tests execution
                      "vblank_mode": "0"}
         for k,v in base_env.items():
-            env[k] = v
+            if k in env:
+                env[k] += ":" + v
+            else:
+                env[k] = v
         self.o.update_env(env)
         all_tests = DeqpTrie()
         if self.o.retest_path:
