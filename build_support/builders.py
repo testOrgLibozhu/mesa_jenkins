@@ -251,11 +251,9 @@ class AutoBuilder(object):
                                str(cpu_count()),
                                "check"], env=self._env)
         except(subprocess.CalledProcessError):
-            print "WARN: make check failed"
             os.chdir(savedir)
-            # bug 91773
-            # Export().create_failing_test(self._project +
-            #                              "-make-check-failure", "")
+            Export().create_failing_test(
+                self._project + "-make-check-failure", "")
         os.chdir(savedir)
 
         if self._tests:
