@@ -826,6 +826,43 @@ class CtsBuilder(CMakeBuilder):
 
     def build(self):
         pm = ProjectMap()
+
+        has_vulkan = os.path.exists(self._src_dir + "/external/spirv-tools")
+        if has_vulkan:
+            spirvtools = self._src_dir + "/external/spirv-tools"
+            if not os.path.islink(spirvtools):
+                bs.rmtree(spirvtools)
+            if not os.path.exists(spirvtools):
+                os.symlink("../../spirvtools", spirvtools)
+            glslang = self._src_dir + "/external/glslang"
+            if not os.path.islink(glslang):
+                bs.rmtree(glslang)
+            if not os.path.exists(glslang):
+                os.symlink("../../glslang", glslang)
+
+            # change spirv-tools and glslang to use the commits specified
+            # in the vulkancts sources
+            sys.path = [os.path.abspath(os.path.normpath(s)) for s in sys.path]
+            sys.path = [gooddir for gooddir in sys.path if "cts" not in gooddir]
+            sys.path.append(self._src_dir + "/external/")
+            fetch_sources = importlib.import_module("fetch_sources", ".")
+            for package in fetch_sources.PACKAGES:
+                try:
+                    if not isinstance(package, fetch_sources.GitRepo):
+                        continue
+                except:
+                    continue
+                repo_path = self._src_dir + "/external/" + package.baseDir
+                print "Cleaning: " + repo_path + " : " + package.revision
+                savedir = os.getcwd()
+                os.chdir(repo_path)
+                bs.run_batch_command(["git", "clean", "-xfd"])
+                bs.run_batch_command(["git", "reset", "--hard", "HEAD"])
+                os.chdir(savedir)
+                print "Checking out: " + repo_path + " : " + package.revision
+                repo = git.Repo(repo_path)
+                repo.git.checkout(package.revision, force=True)
+
         if not os.path.exists(self._build_dir):
             os.makedirs(self._build_dir)
 
