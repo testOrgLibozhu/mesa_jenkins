@@ -479,8 +479,8 @@
       <remote name="aosp" repo="https://android.googlesource.com/platform/external/deqp"/>
     </deqp>
 
-    <cts repo="https://github.com/KhronosGroup/VK-GL-CTS.git"
-         branch="origin/opengl-es-cts-3.2.4"/>
+    <cts repo="ssh://majanes@git-amr-2.devtools.intel.com:29418/otc_gen_graphics-khronos-glconform.git"
+         branch="origin/updated-cts"/>
 
     <glcts repo="ssh://majanes@git-amr-2.devtools.intel.com:29418/otc_gen_graphics-khronos-glconform.git"
            branch="vk-gl-cts/opengl-cts-4.6.0">
