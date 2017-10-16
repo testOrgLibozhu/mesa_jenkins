@@ -817,7 +817,8 @@ class CtsBuilder(CMakeBuilder):
         if suite == "gl":
             extra_definitions.append("-DDEQP_TARGET=x11_egl")
         else:
-            extra_definitions.append("-DDEQP_TARGET=x11_egl")
+            extra_definitions += ["-DDEQP_TARGET=x11_egl",
+                                  "-DDEQP_GLES1_LIBRARIES=/tmp/build_root/"]
         CMakeBuilder.__init__(self, extra_definitions=extra_definitions)
             
     def test(self):
@@ -829,49 +830,50 @@ class CtsBuilder(CMakeBuilder):
     def build(self):
         pm = ProjectMap()
 
-        has_vulkan = os.path.exists(self._src_dir + "/external/spirv-tools")
-        if has_vulkan:
-            spirvtools = self._src_dir + "/external/spirv-tools"
-            if not os.path.islink(spirvtools):
-                rmtree(spirvtools)
-            if not os.path.exists(spirvtools):
-                os.symlink("../../spirvtools", spirvtools)
-            glslang = self._src_dir + "/external/glslang"
-            if not os.path.islink(glslang):
-                rmtree(glslang)
-            if not os.path.exists(glslang):
-                os.symlink("../../glslang", glslang)
-            spirvheaders_dir = self._src_dir + "/external/spirv-headers"
-            if not os.path.exists(spirvheaders_dir):
-                os.makedirs(spirvheaders_dir)
-            spirvheaders = spirvheaders_dir
-            if not os.path.islink(spirvheaders):
-                rmtree(spirvheaders)
-            if not os.path.exists(spirvheaders):
-                os.symlink("../../spirvheaders", spirvheaders)
-            # change spirv-tools and glslang to use the commits specified
-            # in the vulkancts sources
-            sys.path = [os.path.abspath(os.path.normpath(s)) for s in sys.path]
-            sys.path = [gooddir for gooddir in sys.path if "cts" not in gooddir]
-            sys.path.append(self._src_dir + "/external/")
-            fetch_sources = importlib.import_module("fetch_sources", ".")
-            for package in fetch_sources.PACKAGES:
-                try:
-                    if not isinstance(package, fetch_sources.GitRepo):
-                        continue
-                except:
+        spirvtools = self._src_dir + "/external/spirv-tools"
+        if not os.path.islink(spirvtools):
+            rmtree(spirvtools)
+        if not os.path.exists(spirvtools):
+            os.symlink("../../spirvtools", spirvtools)
+        glslang = self._src_dir + "/external/glslang"
+        if not os.path.islink(glslang):
+            rmtree(glslang)
+        if not os.path.exists(glslang):
+            os.symlink("../../glslang", glslang)
+        spirvheaders_dir = self._src_dir + "/external/spirv-headers"
+        if not os.path.exists(spirvheaders_dir):
+            os.makedirs(spirvheaders_dir)
+        spirvheaders = spirvheaders_dir
+        if not os.path.islink(spirvheaders):
+            rmtree(spirvheaders)
+        if not os.path.exists(spirvheaders):
+            os.symlink("../../spirvheaders", spirvheaders)
+        # change spirv-tools and glslang to use the commits specified
+        # in the vulkancts sources
+        sys.path = [os.path.abspath(os.path.normpath(s)) for s in sys.path]
+        sys.path = [gooddir for gooddir in sys.path if "cts" not in gooddir]
+        sys.path.append(self._src_dir + "/external/")
+        fetch_sources = importlib.import_module("fetch_sources", ".")
+        for package in fetch_sources.PACKAGES:
+            try:
+                if not isinstance(package, fetch_sources.GitRepo):
                     continue
-                repo_path = self._src_dir + "/external/" + package.baseDir
-                print "Cleaning: " + repo_path + " : " + package.revision
-                savedir = os.getcwd()
-                if os.path.exists(repo_path):
-                    os.chdir(repo_path)
-                    run_batch_command(["git", "clean", "-xfd"])
-                    run_batch_command(["git", "reset", "--hard", "HEAD"])
-                    os.chdir(savedir)
-                    print "Checking out: " + repo_path + " : " + package.revision
-                    repo = git.Repo(repo_path)
-                    repo.git.checkout(package.revision, force=True)
+            except:
+                continue
+            repo_path = self._src_dir + "/external/" + package.baseDir
+            print "Cleaning: " + repo_path + " : " + package.revision
+            savedir = os.getcwd()
+            if os.path.exists(repo_path):
+                os.chdir(repo_path)
+                run_batch_command(["git", "clean", "-xfd"])
+                run_batch_command(["git", "reset", "--hard", "HEAD"])
+                os.chdir(savedir)
+                print "Checking out: " + repo_path + " : " + package.revision
+                repo = git.Repo(repo_path)
+                repo.git.checkout(package.revision, force=True)
+        spirvheaders = self._src_dir + "/external/spirv-tools/external/spirv-headers"
+        if not os.path.exists(spirvheaders):
+            os.symlink("../../spirvheaders", spirvheaders)
 
         if not os.path.exists(self._build_dir):
             os.makedirs(self._build_dir)
@@ -897,7 +899,7 @@ class CtsBuilder(CMakeBuilder):
         run_batch_command(["ninja","-j" + str(cpu_count())], env=env)
 
         install_dir = pm.build_root() + "/bin/" + self._suite
-        binary_dir = self._build_dir + "/cts"
+        binary_dir = self._build_dir + "/modules"
         if self._suite == "gl":
             binary_dir = self._build_dir + "/external/openglcts/modules"
         run_batch_command(["mkdir", "-p", install_dir])
