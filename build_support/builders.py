@@ -30,6 +30,8 @@ import re
 import socket
 import subprocess
 import sys
+import importlib
+import git
 import time
 import urllib2
 import xml.etree.cElementTree as et
@@ -815,7 +817,7 @@ class CtsBuilder(CMakeBuilder):
         if suite == "gl":
             extra_definitions.append("-DDEQP_TARGET=x11_egl")
         else:
-            extra_definitions.append("-DDEQP_TARGET=x11")
+            extra_definitions.append("-DDEQP_TARGET=x11_egl")
         CMakeBuilder.__init__(self, extra_definitions=extra_definitions)
             
     def test(self):
@@ -831,15 +833,22 @@ class CtsBuilder(CMakeBuilder):
         if has_vulkan:
             spirvtools = self._src_dir + "/external/spirv-tools"
             if not os.path.islink(spirvtools):
-                bs.rmtree(spirvtools)
+                rmtree(spirvtools)
             if not os.path.exists(spirvtools):
                 os.symlink("../../spirvtools", spirvtools)
             glslang = self._src_dir + "/external/glslang"
             if not os.path.islink(glslang):
-                bs.rmtree(glslang)
+                rmtree(glslang)
             if not os.path.exists(glslang):
                 os.symlink("../../glslang", glslang)
-
+            spirvheaders_dir = self._src_dir + "/external/spirv-headers"
+            if not os.path.exists(spirvheaders_dir):
+                os.makedirs(spirvheaders_dir)
+            spirvheaders = spirvheaders_dir
+            if not os.path.islink(spirvheaders):
+                rmtree(spirvheaders)
+            if not os.path.exists(spirvheaders):
+                os.symlink("../../spirvheaders", spirvheaders)
             # change spirv-tools and glslang to use the commits specified
             # in the vulkancts sources
             sys.path = [os.path.abspath(os.path.normpath(s)) for s in sys.path]
@@ -855,13 +864,14 @@ class CtsBuilder(CMakeBuilder):
                 repo_path = self._src_dir + "/external/" + package.baseDir
                 print "Cleaning: " + repo_path + " : " + package.revision
                 savedir = os.getcwd()
-                os.chdir(repo_path)
-                bs.run_batch_command(["git", "clean", "-xfd"])
-                bs.run_batch_command(["git", "reset", "--hard", "HEAD"])
-                os.chdir(savedir)
-                print "Checking out: " + repo_path + " : " + package.revision
-                repo = git.Repo(repo_path)
-                repo.git.checkout(package.revision, force=True)
+                if os.path.exists(repo_path):
+                    os.chdir(repo_path)
+                    run_batch_command(["git", "clean", "-xfd"])
+                    run_batch_command(["git", "reset", "--hard", "HEAD"])
+                    os.chdir(savedir)
+                    print "Checking out: " + repo_path + " : " + package.revision
+                    repo = git.Repo(repo_path)
+                    repo.git.checkout(package.revision, force=True)
 
         if not os.path.exists(self._build_dir):
             os.makedirs(self._build_dir)
