@@ -679,7 +679,7 @@ class CtsTestList(object):
             }
 
         # provide a DeqpTrie with all tests
-        binary = br + "/bin/es/cts/glcts"
+        binary = br + "/bin/es/modules/glcts"
         cts_dir = os.path.dirname(binary)
         os.chdir(cts_dir)
         if env is None:
