@@ -670,31 +670,41 @@ class CtsTestList(object):
         self.version = None
 
     def tests(self, env=None):
-        br = self.pm.build_root()
+        br = self.pm.build_root() + "/share"
+        mustpass_dir = self.pm.source_root() + "/repos/cts/build_" + self.o.arch + "/external/openglcts/modules/gl_cts/data/mustpass/gles/khronos_mustpass" 
+        cmd = ["rsync", "-rlpzD",
+               mustpass_dir, br]
+        run_batch_command(cmd)
+
         whitelists = {
-            "ES2-CTS-cases.xml": br + "/bin/es/cts/gl_cts/data/aosp_mustpass/gles2-master.txt",
-            "ES3-CTS-cases.xml": br + "/bin/es/cts/gl_cts/data/aosp_mustpass/gles3-master.txt",
-            "ES31-CTS-cases.xml": br + "/bin/es/cts/gl_cts/data/aosp_mustpass/gles31-master.txt",
-            "ES32-CTS-cases.xml": br + "/bin/es/cts/gl_cts/data/aosp_mustpass/gles32-master.txt",
+            "ES2-CTS-cases.xml": br + "/khronos_mustpass/3.2.4.x/gles2-gtf-egl.txt",
+            "ES3-CTS-cases.xml": br + "/khronos_mustpass/3.2.4.x/gles2-gtf-master.txt",
+            "ES31-CTS-cases.xml": br + "/khronos_mustpass/3.2.4.x/gles2-khr-master.txt",
+            "ES32-CTS-cases.xml": br + "/khronos_mustpass/3.2.4.x/gles31-gtf-master.txt",
+            "ES32-CTS-cases.xml": br + "/khronos_mustpass/3.2.4.x/gles31-khr-master.txt",
+            "ES32-CTS-cases.xml": br + "/khronos_mustpass/3.2.4.x/gles32-khr-master.txt",
+            "ES32-CTS-cases.xml": br + "/khronos_mustpass/3.2.4.x/gles3-gtf-master.txt",
+            "ES32-CTS-cases.xml": br + "/khronos_mustpass/3.2.4.x/gles3-khr-master.txt"
             }
 
         # provide a DeqpTrie with all tests
-        binary = br + "/bin/es/modules/glcts"
-        cts_dir = os.path.dirname(binary)
-        os.chdir(cts_dir)
-        if env is None:
-            libdir = "x86_64-linux-gnu"
-            if self.o.arch == "m32":
-                libdir = "i386-linux-gnu"
-            env = {"MESA_GLES_VERSION_OVERRIDE" : "3.2",
-                   "LD_LIBRARY_PATH" : br + "/lib:" + \
-                   br + "/lib/" + libdir + ":" + br + "/lib/dri",
-                   "LIBGL_DRIVERS_PATH" : br + "/lib/dri"}
-            self.o.update_env(env)
+        for a_suit in ("egl","gles2","gles3","gles31"):
+            binary = br + "/../bin/es/modules/" + a_suit + "/deqp-" + a_suit
+            cts_dir = os.path.dirname(binary)
+            os.chdir(cts_dir)
+            if env is None:
+                libdir = "x86_64-linux-gnu"
+                if self.o.arch == "m32":
+                    libdir = "i386-linux-gnu"
+                env = {"MESA_GLES_VERSION_OVERRIDE" : "3.2",
+                       "LD_LIBRARY_PATH" : br + "/lib:" + \
+                       br + "/lib/" + libdir + ":" + br + "/lib/dri",
+                       "LIBGL_DRIVERS_PATH" : br + "/lib/dri"}
+                self.o.update_env(env)
 
-        save_override = env["MESA_GLES_VERSION_OVERRIDE"]
-        env["MESA_GLES_VERSION_OVERRIDE"] = "3.2"
-        cmd = [binary, "--deqp-runmode=xml-caselist"]
+            save_override = env["MESA_GLES_VERSION_OVERRIDE"]
+            env["MESA_GLES_VERSION_OVERRIDE"] = "3.2"
+            cmd = [binary, "--deqp-runmode=xml-caselist"]
 
         # Try to generate the case list a lot, if that fails then just bail.
         # This is related to a bug in the gles-cts

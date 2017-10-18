@@ -52,7 +52,7 @@ class GLESCTSTester(object):
                 # unsupported platforms
                 return
 
-        results = t.test(self.pm.build_root() + "/bin/es/cts/glcts",
+        results = t.test(self.pm.build_root() + "/bin/es/modules/gles31/deqp-gles31",
                          bs.CtsTestList(),
                          [],
                          self.env)
